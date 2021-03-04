@@ -17,7 +17,7 @@ class TimerViewModel : ViewModel() {
     private var timerDataModel: TimerDataModel = TimerDataModel()
 
     private var tickerChannel = ticker(delayMillis = 1, initialDelayMillis = 0)
-    private var tMilliSec = 0
+    var tMilliSec = 0
     private var timeStr: String = ""
 
     private var _textTimer = MutableLiveData<String>().apply {

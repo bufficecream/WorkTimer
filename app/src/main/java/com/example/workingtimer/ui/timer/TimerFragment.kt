@@ -13,12 +13,9 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.workingtimer.R
-import kotlinx.coroutines.channels.ticker
-import kotlinx.coroutines.launch
 
 class TimerFragment : Fragment() {
 
@@ -51,12 +48,15 @@ class TimerFragment : Fragment() {
         val lapRecordRecycleView: RecyclerView = root.findViewById(R.id.lap_record)
         lapRecordRecycleView.layoutManager = LinearLayoutManager(context)
         lapRecordRecycleView.adapter = mAdapter
-
         //TODO test for showing
         for(i in 0..50){
-            myItemList.add(LapItem("#$i", "01,01", "1,40,41", "Workout", "#666666"))
+            myItemList.add(LapItem("#$i", "01:01:01", "09:40:41", "Workout", "#666666"))
         }
         mAdapter.updateList(myItemList)
+
+
+
+        timerViewModel.tMilliSec = sharedPref.getInt(tMilliSecStr, 0)
 
         state_play = sharedPref.getBoolean(FLAG_STR, FLAG_PLAY)
 
@@ -77,7 +77,7 @@ class TimerFragment : Fragment() {
         resetBtn.setOnClickListener{
 
             timerViewModel.reset()
-            sharedPref.edit().putInt(TimerFragment.tMilliSecStr, 0).apply()
+            sharedPref.edit().putInt(tMilliSecStr, 0).apply()
 
             closeBtnVisibility(resetBtn)
             closeBtnVisibility(lapBtn)
@@ -89,6 +89,8 @@ class TimerFragment : Fragment() {
             //TODO update DB, after testing the timer
 //            timerViewModel.lap()
         }
+
+        resumeTimer()
 
         return root
     }
@@ -118,9 +120,6 @@ class TimerFragment : Fragment() {
 
     private fun updateFlag(flag: Boolean) {
 
-//        flag = if (flag) FLAG_PAUSE else FLAG_PLAY
-//        return if(flag) FLAG_PAUSE else FLAG_PLAY
-
         state_play = if(flag) FLAG_PAUSE else FLAG_PLAY
         sharedPref.edit().putBoolean(FLAG_STR, state_play).apply()
     }
@@ -134,6 +133,20 @@ class TimerFragment : Fragment() {
         }
     }
 
+    private fun resumeTimer(){
+        if(!state_play){
+            timerViewModel.play_or_pause(FLAG_PLAY)
+        }
+    }
+
+    override fun onPause() {
+        super.onPause()
+
+        sharedPref.edit().putInt(tMilliSecStr, timerViewModel.tMilliSec).apply()
+
+        Log.d(TAG, "onPause")
+    }
+
     companion object {
 
         const val TAG: String = "TimerFragment"
@@ -145,6 +158,7 @@ class TimerFragment : Fragment() {
 
         const val TIME_ORIGIN = "00:00:00"
     }
+
 
 }
 
