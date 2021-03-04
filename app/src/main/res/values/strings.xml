@@ -1,0 +1,19 @@
+<resources>
+    <string name="app_name">WorkingTimer</string>
+    <string name="title_timer">Timer</string>
+    <string name="title_history">History</string>
+    <string name="title_common_works">Common Works</string>
+
+
+    <string name="btn_reset">Reset</string>
+    <string name="btn_play_or_pause">Play</string>
+    <string name="btn_lap">Lap</string>
+
+    <string name="btn_add_new_work">Add new work</string>
+    <string name="text_work">work</string>
+
+
+    <string name="size_color">18dp</string>
+
+
+</resources>

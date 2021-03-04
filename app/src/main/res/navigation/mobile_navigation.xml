@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mobile_navigation"
+    app:startDestination="@+id/navigation_timer">
+
+    <fragment
+        android:id="@+id/navigation_timer"
+        android:name="com.example.workingtimer.ui.timer.TimerFragment"
+        android:label="@string/title_timer"
+        tools:layout="@layout/fragment_timer" />
+
+    <fragment
+        android:id="@+id/navigation_history"
+        android:name="com.example.workingtimer.ui.history.HistoryFragment"
+        android:label="@string/title_history"
+        tools:layout="@layout/fragment_history" />
+
+    <fragment
+        android:id="@+id/navigation_common_works"
+        android:name="com.example.workingtimer.ui.commonWorks.CommonWorksFragment"
+        android:label="@string/title_common_works"
+        tools:layout="@layout/fragment_common_works" />
+</navigation>
