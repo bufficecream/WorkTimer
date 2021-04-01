@@ -4,10 +4,13 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.channels.ticker
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.util.*
 
 class TimerViewModel : ViewModel() {
@@ -16,7 +19,8 @@ class TimerViewModel : ViewModel() {
 
     private var timerDataModel: TimerDataModel = TimerDataModel()
 
-    private var tickerChannel = ticker(delayMillis = 1, initialDelayMillis = 0)
+    private lateinit var tickerChannel: ReceiveChannel<Unit>
+//    = ticker(delayMillis = 1, initialDelayMillis = 0)
     var tMilliSec = 0
     private var timeStr: String = ""
 
@@ -36,9 +40,48 @@ class TimerViewModel : ViewModel() {
             play() else pause()
     }
 
-    private fun play(){
+    fun play(){
 
         Log.d(TAG, "play")
+
+        tickerChannel = ticker(delayMillis = 1, initialDelayMillis = 0)
+
+        var pre_tSec = -1
+
+        viewModelScope.launch {
+            for(event in tickerChannel){
+
+                tMilliSec++
+                var tSec = tMilliSec / 1000
+
+                if(pre_tSec != tSec){
+
+                    Log.d(TAG, ""+tSec)
+
+                    pre_tSec = tSec
+
+                    computeTimeStr(tSec)
+
+                    withContext(Dispatchers.IO) {
+
+                        _textTimer.postValue(timeStr)
+                    }
+                }
+            }
+        }
+    }
+
+    fun updateTime(tSec: Int){
+
+        computeTimeStr(tSec)
+
+        _textTimer.postValue(timeStr)
+    }
+
+    fun playBackground(){
+        Log.d(TAG, "playBackground")
+
+        tickerChannel = ticker(delayMillis = 1, initialDelayMillis = 0)
 
         var pre_tSec = -1
 
@@ -46,33 +89,38 @@ class TimerViewModel : ViewModel() {
             for(event in tickerChannel){
 
                 tMilliSec++
-                val tSec = tMilliSec / 1000
+                var tSec = tMilliSec / 1000
 
                 if(pre_tSec != tSec){
 
+                    Log.d(TAG, ""+tSec)
+
                     pre_tSec = tSec
 
-                    val cSec = tSec%60
-                    val cMin = (tSec/60)%60
-                    val cHr = (tSec/3600)%24
-
-                    timeStr = ""
-                    lateinit var sHr: String
-                    if(cHr < 10) sHr = "0" else sHr = ""
-                    timeStr = sHr + cHr
-
-                    lateinit var sMin: String
-                    if(cMin < 10) sMin = ":0" else sMin = ":"
-                    timeStr += sMin + cMin
-
-                    lateinit var sSec: String
-                    if(cSec < 10) sSec = ":0" else sSec = ":"
-                    timeStr += sSec + cSec
-
-                    _textTimer.postValue(timeStr)
+                    computeTimeStr(tSec)
                 }
             }
         }
+    }
+
+    private fun computeTimeStr(tSec: Int){
+
+        val cSec = tSec%60
+        val cMin = (tSec/60)%60
+        val cHr = (tSec/3600)%24
+
+        timeStr = ""
+        lateinit var sHr: String
+        sHr = if(cHr < 10) "0" else ""
+        timeStr = sHr + cHr
+
+        lateinit var sMin: String
+        sMin = if(cMin < 10) ":0" else ":"
+        timeStr += sMin + cMin
+
+        lateinit var sSec: String
+        sSec = if(cSec < 10) ":0" else ":"
+        timeStr += sSec + cSec
     }
 
     private fun pause(){
@@ -80,6 +128,8 @@ class TimerViewModel : ViewModel() {
         Log.d(TAG, "pause")
 
         cancelTicker()
+
+        timerDataModel.storeInDB()
     }
 
     fun reset(){
@@ -93,11 +143,14 @@ class TimerViewModel : ViewModel() {
         _textTimer.postValue(timerDataModel.TIME_ORIGIN)
     }
 
-    private fun cancelTicker(){
+    fun cancelTicker(){
 
-        tickerChannel.cancel()
-        //TODO, weird that the ticker being reinitialized
-        tickerChannel = ticker(delayMillis = 1, initialDelayMillis = 0)
+        try {
+            tickerChannel.cancel()
+        } catch (e: UninitializedPropertyAccessException) {
+            Log.e(TAG, "tickerChannel haven't been created yet")
+        }
+
     }
 
     fun lap(){

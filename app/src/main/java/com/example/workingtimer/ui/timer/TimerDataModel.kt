@@ -9,4 +9,9 @@ class TimerDataModel {
 
     val TIME_ORIGIN = "00:00:00"
 
+
+    fun storeInDB(){
+
+    }
+
 }
