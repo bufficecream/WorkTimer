@@ -15,8 +15,8 @@ class CommonWorksFragment : Fragment() {
 
     private lateinit var commonWorksViewModel: CommonWorksViewModel
 
-    val mAdapter = CommonWorksAdapter()
-    val myItemList = arrayListOf<CommonWorksItem>()
+    private val mAdapter = CommonWorksAdapter()
+    private val myItemList = arrayListOf<CommonWorksItem>()
 
     override fun onCreateView(
             inflater: LayoutInflater,
@@ -31,30 +31,20 @@ class CommonWorksFragment : Fragment() {
         commonWorksListRecycleView.layoutManager = LinearLayoutManager(context)
         commonWorksListRecycleView.adapter = mAdapter
 
-
-        //TODO test for showing
+        // TODO this is for the demo level, we should provide proper interface for next
         for(i in 0..50){
-//            myItemList.add(CommonWorksItem("Email", "#FFF00$i"))
+
             myItemList.add(CommonWorksItem("Email", "#666666"))
         }
         mAdapter.updateList(myItemList)
 
-
         val addNewWorkBtn: Button = root.findViewById(R.id.addNewBtn)
         addNewWorkBtn.setOnClickListener {
-            //TODO pop-up a dialog
-
-
+            //TODO implement pop-up a dialog
+            val newFragment = AddNewWorkDialog()
+            newFragment.show(childFragmentManager, newFragment.TAG)
         }
-
-
 
         return root
     }
-
-
-
-
-
-
 }

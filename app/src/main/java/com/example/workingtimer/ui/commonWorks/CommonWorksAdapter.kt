@@ -49,7 +49,7 @@ class CommonWorksAdapter: RecyclerView.Adapter<CommonWorksAdapter.mViewHolder>()
         return unAssignList.size
     }
 
-    fun updateList(list:ArrayList<CommonWorksItem>){
+    fun updateList(list: ArrayList<CommonWorksItem>){
         unAssignList = list
     }
 

@@ -11,7 +11,6 @@ import android.widget.Button
 import android.widget.ImageButton
 import android.widget.TextView
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -22,27 +21,24 @@ class TimerFragment : Fragment() {
     private lateinit var timerViewModel: TimerViewModel
 
     private val mAdapter = TimerAdapter()
-    private val myItemList = arrayListOf<LapItem>()
+    private val mMyItemList = arrayListOf<LapItem>()
 
-    private var btn_state_play: Boolean = FLAG_PLAY
+    private var mBtnStatePlay: Boolean = FLAG_PLAY
 
-    lateinit var sharedPref: SharedPreferences
+    private lateinit var sharedPref: SharedPreferences
 
     override fun onCreateView(
             inflater: LayoutInflater,
             container: ViewGroup?,
             savedInstanceState: Bundle?
     ): View? {
-        Log.d(TAG, "onCreateView")
-
-        //Return the {@link Context} this fragment is currently associated with.
         sharedPref = requireContext().getSharedPreferences(getString(R.string.app_name), Context.MODE_PRIVATE)
 
         timerViewModel =
                 ViewModelProvider(this).get(TimerViewModel::class.java)
         val root = inflater.inflate(R.layout.fragment_timer, container, false)
         val textTimerView: TextView = root.findViewById(R.id.text_timer)
-        timerViewModel.textTimer.observe(viewLifecycleOwner, Observer {
+        timerViewModel.textTimer.observe(viewLifecycleOwner, {
 
             //TODO change to the counting time when the user swipe to the other page
             textTimerView.text = it
@@ -51,27 +47,26 @@ class TimerFragment : Fragment() {
         val lapRecordRecycleView: RecyclerView = root.findViewById(R.id.lap_record)
         lapRecordRecycleView.layoutManager = LinearLayoutManager(context)
         lapRecordRecycleView.adapter = mAdapter
+
         //TODO stealth it when the showing function is complete
         testShowing(mAdapter)
 
-
-
         timerViewModel.tMilliSec = sharedPref.getInt(tMilliSecStr, 0)
 
-        btn_state_play = sharedPref.getBoolean(FLAG_STR, FLAG_PLAY)
+        mBtnStatePlay = sharedPref.getBoolean(FLAG_STR, FLAG_PLAY)
 
-        val play_or_pauseBtn: ImageButton = root.findViewById(R.id.btn_play_or_pause)
+        val playOrPauseBtn: ImageButton = root.findViewById(R.id.btn_play_or_pause)
         val resetBtn: Button = root.findViewById(R.id.resetBtn)
         val lapBtn: Button = root.findViewById(R.id.lapBtn)
 
-        play_or_pauseBtn.setOnClickListener {
+        playOrPauseBtn.setOnClickListener {
 
             //TODO update DB, after testing the timer
-            timerViewModel.play_or_pause(btn_state_play)
+            timerViewModel.play_or_pause(mBtnStatePlay)
 
             showBtnVisibility(resetBtn)
             showBtnVisibility(lapBtn)
-            updateBtnImage(play_or_pauseBtn)
+            updateBtnImage(playOrPauseBtn)
         }
 
         resetBtn.setOnClickListener{
@@ -81,7 +76,7 @@ class TimerFragment : Fragment() {
 
             closeBtnVisibility(resetBtn)
             closeBtnVisibility(lapBtn)
-            showPlayImage(play_or_pauseBtn)
+            showPlayImage(playOrPauseBtn)
         }
 
         lapBtn.setOnClickListener{
@@ -90,7 +85,7 @@ class TimerFragment : Fragment() {
 //            timerViewModel.lap()
         }
 
-        restoreTimerState(resetBtn, lapBtn, play_or_pauseBtn)
+        restoreTimerState(resetBtn, lapBtn, playOrPauseBtn)
 
         return root
     }
@@ -104,7 +99,7 @@ class TimerFragment : Fragment() {
             showBtnVisibility(lapBtn)
         }
 
-        if(!btn_state_play){
+        if(!mBtnStatePlay){
 
             timerViewModel.play()
             play_or_pauseBtn.setImageResource(android.R.drawable.ic_media_pause)
@@ -115,9 +110,9 @@ class TimerFragment : Fragment() {
     private fun testShowing(mAdapter: TimerAdapter){
 
         for(i in 0..50){
-            myItemList.add(LapItem("#$i", "01:01:01", "09:40:41", "Workout", "#666666"))
+            mMyItemList.add(LapItem("#$i", "01:01:01", "09:40:41", "Workout", "#666666"))
         }
-        mAdapter.updateList(myItemList)
+        mAdapter.updateList(mMyItemList)
     }
 
     private fun showBtnVisibility(btn: Button) {
@@ -132,7 +127,7 @@ class TimerFragment : Fragment() {
 
     private fun updateBtnImage(btn: ImageButton){
 
-        if(btn_state_play){
+        if(mBtnStatePlay){
 
             btn.setImageResource(android.R.drawable.ic_media_pause)
         }else{
@@ -140,65 +135,40 @@ class TimerFragment : Fragment() {
             btn.setImageResource(android.R.drawable.ic_media_play)
         }
 
-        updateFlag(btn_state_play)
+        updateFlag(mBtnStatePlay)
     }
 
     private fun updateFlag(flag: Boolean) {
 
-        btn_state_play = if(flag) FLAG_PAUSE else FLAG_PLAY
-        sharedPref.edit().putBoolean(FLAG_STR, btn_state_play).apply()
+        mBtnStatePlay = if(flag) FLAG_PAUSE else FLAG_PLAY
+        sharedPref.edit().putBoolean(FLAG_STR, mBtnStatePlay).apply()
     }
 
     private fun showPlayImage(btn: ImageButton){
 
-        if(!btn_state_play){
+        if(!mBtnStatePlay){
 
             btn.setImageResource(android.R.drawable.ic_media_play)
-            updateFlag(btn_state_play)
+            updateFlag(mBtnStatePlay)
         }
-    }
-
-    override fun onStart() {
-        super.onStart()
-        Log.d(TAG, "onStart")
-
-    }
-
-    override fun onResume() {
-        super.onResume()
-        Log.d(TAG, "onResume")
-
     }
 
     override fun onPause() {
         super.onPause()
-        Log.d(TAG, "onPause")
-
         sharedPref.edit().putInt(tMilliSecStr, timerViewModel.tMilliSec).apply()
-
     }
 
     override fun onStop() {
         super.onStop()
         Log.d(TAG, "onStop")
 
-//        if(!btn_state_play){
+//        if(!btnStatePlay){
 //
 //            timerViewModel.cancelTicker()
 //            timerViewModel.playBackground()
 //        }
         //TODO light up a service to keep running the timer
 
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        Log.d(TAG, "onDestroyView")
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        Log.d(TAG, "onDestroy")
     }
 
     companion object {
@@ -212,7 +182,6 @@ class TimerFragment : Fragment() {
 
         const val TIME_ORIGIN = "00:00:00"
     }
-
 
 }
 

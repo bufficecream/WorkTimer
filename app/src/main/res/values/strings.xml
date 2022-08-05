@@ -12,8 +12,16 @@
     <string name="btn_add_new_work">Add new work</string>
     <string name="text_work">work</string>
 
+    <string name="work_name">Work Name</string>
+
 
     <string name="size_color">18dp</string>
+
+    <string name="confirm">Confirm</string>
+    <string name="cancel">Cancel</string>
+
+    <string name="space"> </string>
+
 
 
 </resources>
