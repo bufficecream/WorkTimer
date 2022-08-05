@@ -51,7 +51,7 @@ class TimerFragment : Fragment() {
         //TODO stealth it when the showing function is complete
         testShowing(mAdapter)
 
-        timerViewModel.tMilliSec = sharedPref.getInt(tMilliSecStr, 0)
+        timerViewModel.tMilliSec = sharedPref.getInt(MilliSecStr, 0)
 
         mBtnStatePlay = sharedPref.getBoolean(FLAG_STR, FLAG_PLAY)
 
@@ -72,7 +72,7 @@ class TimerFragment : Fragment() {
         resetBtn.setOnClickListener{
 
             timerViewModel.reset()
-            sharedPref.edit().putInt(tMilliSecStr, 0).apply()
+            sharedPref.edit().putInt(MilliSecStr, 0).apply()
 
             closeBtnVisibility(resetBtn)
             closeBtnVisibility(lapBtn)
@@ -108,7 +108,6 @@ class TimerFragment : Fragment() {
     }
 
     private fun testShowing(mAdapter: TimerAdapter){
-
         for(i in 0..50){
             mMyItemList.add(LapItem("#$i", "01:01:01", "09:40:41", "Workout", "#666666"))
         }
@@ -116,22 +115,17 @@ class TimerFragment : Fragment() {
     }
 
     private fun showBtnVisibility(btn: Button) {
-
         if (btn.visibility == View.GONE) btn.visibility = View.VISIBLE
     }
 
     private fun closeBtnVisibility(btn: Button){
-
         if (btn.visibility == View.VISIBLE) btn.visibility = View.GONE
     }
 
     private fun updateBtnImage(btn: ImageButton){
-
         if(mBtnStatePlay){
-
             btn.setImageResource(android.R.drawable.ic_media_pause)
         }else{
-
             btn.setImageResource(android.R.drawable.ic_media_play)
         }
 
@@ -139,15 +133,12 @@ class TimerFragment : Fragment() {
     }
 
     private fun updateFlag(flag: Boolean) {
-
         mBtnStatePlay = if(flag) FLAG_PAUSE else FLAG_PLAY
         sharedPref.edit().putBoolean(FLAG_STR, mBtnStatePlay).apply()
     }
 
     private fun showPlayImage(btn: ImageButton){
-
         if(!mBtnStatePlay){
-
             btn.setImageResource(android.R.drawable.ic_media_play)
             updateFlag(mBtnStatePlay)
         }
@@ -155,7 +146,7 @@ class TimerFragment : Fragment() {
 
     override fun onPause() {
         super.onPause()
-        sharedPref.edit().putInt(tMilliSecStr, timerViewModel.tMilliSec).apply()
+        sharedPref.edit().putInt(MilliSecStr, timerViewModel.tMilliSec).apply()
     }
 
     override fun onStop() {
@@ -167,15 +158,14 @@ class TimerFragment : Fragment() {
 //            timerViewModel.cancelTicker()
 //            timerViewModel.playBackground()
 //        }
-        //TODO light up a service to keep running the timer
+        //TODO start the service to keep running the timer
 
     }
 
     companion object {
-
         const val TAG: String = "TimerFragment"
 
-        const val tMilliSecStr = "tMilliSec"
+        const val MilliSecStr = "MilliSec"
         const val FLAG_STR = "state_play"
         const val FLAG_PLAY = true
         const val FLAG_PAUSE = false

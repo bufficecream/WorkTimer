@@ -10,6 +10,8 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.workingtimer.R
+import com.example.workingtimer.ui.timer.LapItem
+import com.example.workingtimer.ui.timer.TimerAdapter
 
 class CommonWorksFragment : Fragment() {
 
@@ -25,18 +27,12 @@ class CommonWorksFragment : Fragment() {
     ): View? {
         commonWorksViewModel =
                 ViewModelProvider(this).get(CommonWorksViewModel::class.java)
+
         val root = inflater.inflate(R.layout.fragment_common_works, container, false)
 
         val commonWorksListRecycleView: RecyclerView = root.findViewById(R.id.commonWorksList)
         commonWorksListRecycleView.layoutManager = LinearLayoutManager(context)
         commonWorksListRecycleView.adapter = mAdapter
-
-        // TODO this is for the demo level, we should provide proper interface for next
-        for(i in 0..50){
-
-            myItemList.add(CommonWorksItem("Email", "#666666"))
-        }
-        mAdapter.updateList(myItemList)
 
         val addNewWorkBtn: Button = root.findViewById(R.id.addNewBtn)
         addNewWorkBtn.setOnClickListener {
@@ -45,6 +41,16 @@ class CommonWorksFragment : Fragment() {
             newFragment.show(childFragmentManager, newFragment.TAG)
         }
 
+        // TODO this is for the demo level, we should provide proper interface for next
+        testShowing()
+
         return root
+    }
+
+    private fun testShowing(){
+        for(i in 0..50){
+            myItemList.add(CommonWorksItem("Email", "#666666"))
+        }
+        mAdapter.updateList(myItemList)
     }
 }
