@@ -49,7 +49,7 @@ class CommonWorksFragment : Fragment() {
 
     private fun testShowing(){
         for(i in 0..50){
-            myItemList.add(CommonWorksItem("Email", "#666666"))
+            myItemList.add(CommonWorksItem("Email", "#800080"))
         }
         mAdapter.updateList(myItemList)
     }

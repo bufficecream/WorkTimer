@@ -15,7 +15,7 @@ import java.util.*
 
 class TimerViewModel : ViewModel() {
 
-    val TAG: String = "TimerViewModel"
+    private val TAG: String = "TimerViewModel"
 
     private var timerDataModel: TimerDataModel = TimerDataModel()
 
@@ -35,15 +35,12 @@ class TimerViewModel : ViewModel() {
     var textLapRecord: LiveData<String> = _textLapRecord
 
 
-    fun play_or_pause(state_play: Boolean){
+    fun playOrPause(state_play: Boolean){
         if(state_play)
             play() else pause()
     }
 
     fun play(){
-
-        Log.d(TAG, "play")
-
         tickerChannel = ticker(delayMillis = 1, initialDelayMillis = 0)
 
         var pre_tSec = -1
@@ -55,15 +52,10 @@ class TimerViewModel : ViewModel() {
                 var tSec = tMilliSec / 1000
 
                 if(pre_tSec != tSec){
-
-                    Log.d(TAG, ""+tSec)
-
                     pre_tSec = tSec
-
                     computeTimeStr(tSec)
 
                     withContext(Dispatchers.IO) {
-
                         _textTimer.postValue(timeStr)
                     }
                 }
@@ -79,24 +71,17 @@ class TimerViewModel : ViewModel() {
     }
 
     fun playBackground(){
-        Log.d(TAG, "playBackground")
-
         tickerChannel = ticker(delayMillis = 1, initialDelayMillis = 0)
 
         var pre_tSec = -1
 
         GlobalScope.launch {
             for(event in tickerChannel){
-
                 tMilliSec++
                 var tSec = tMilliSec / 1000
 
                 if(pre_tSec != tSec){
-
-                    Log.d(TAG, ""+tSec)
-
                     pre_tSec = tSec
-
                     computeTimeStr(tSec)
                 }
             }
@@ -104,53 +89,38 @@ class TimerViewModel : ViewModel() {
     }
 
     private fun computeTimeStr(tSec: Int){
-
         val cSec = tSec%60
         val cMin = (tSec/60)%60
         val cHr = (tSec/3600)%24
 
         timeStr = ""
-        lateinit var sHr: String
-        sHr = if(cHr < 10) "0" else ""
+        val sHr: String = if(cHr < 10) "0" else ""
         timeStr = sHr + cHr
 
-        lateinit var sMin: String
-        sMin = if(cMin < 10) ":0" else ":"
+        val sMin: String = if(cMin < 10) ":0" else ":"
         timeStr += sMin + cMin
 
-        lateinit var sSec: String
-        sSec = if(cSec < 10) ":0" else ":"
+        val sSec: String = if(cSec < 10) ":0" else ":"
         timeStr += sSec + cSec
     }
 
     private fun pause(){
-
-        Log.d(TAG, "pause")
-
         cancelTicker()
-
         timerDataModel.storeInDB()
     }
 
     fun reset(){
-
-        Log.d(TAG, "reset")
-
         cancelTicker()
-
         tMilliSec = 0
-
         _textTimer.postValue(timerDataModel.TIME_ORIGIN)
     }
 
-    fun cancelTicker(){
-
+    private fun cancelTicker(){
         try {
             tickerChannel.cancel()
         } catch (e: UninitializedPropertyAccessException) {
             Log.e(TAG, "tickerChannel haven't been created yet")
         }
-
     }
 
     fun lap(){

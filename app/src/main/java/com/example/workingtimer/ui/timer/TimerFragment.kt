@@ -17,6 +17,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.workingtimer.R
 
 class TimerFragment : Fragment() {
+    private val TAG: String = "TimerFragment"
 
     private lateinit var timerViewModel: TimerViewModel
 
@@ -62,7 +63,7 @@ class TimerFragment : Fragment() {
         playOrPauseBtn.setOnClickListener {
 
             //TODO update DB, after testing the timer
-            timerViewModel.play_or_pause(mBtnStatePlay)
+            timerViewModel.playOrPause(mBtnStatePlay)
 
             showBtnVisibility(resetBtn)
             showBtnVisibility(lapBtn)
@@ -163,8 +164,6 @@ class TimerFragment : Fragment() {
     }
 
     companion object {
-        const val TAG: String = "TimerFragment"
-
         const val MilliSecStr = "MilliSec"
         const val FLAG_STR = "state_play"
         const val FLAG_PLAY = true
